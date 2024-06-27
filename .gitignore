@@ -1,0 +1,10 @@
+mmdetection
+dataset/annotation
+dataset/folds
+results/*
+
+.RData
+.Rhistory
+.idea
+
+__pycache__
