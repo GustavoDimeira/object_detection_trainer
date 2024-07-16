@@ -23,7 +23,7 @@ def checkBest(self, runner):
                 "loss": crr_loss
             }
         else:
-            if best_model["loss"] >= crr_loss:  # update the best_model if it improves the loss
+            if best_model["loss"] >= crr_loss:  # update the best_model if the loss has been improved
                 best_model = {
                     "epoch": crr_epoch,
                     "loss": crr_loss

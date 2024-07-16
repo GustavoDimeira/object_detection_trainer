@@ -9,8 +9,13 @@ EPOCHS = 100
 PATIENCE = .05
 LIMIAR_CLASSIFICADOR = 0.5
 LIMIAR_IOU = 0.5
-
 EARLY_STOP = True
+
+# -----------------------
+# Define other variabels
+# -----------------------
+
+SAVE_IMAGES = False
 SKIP_TRAIN = True
 OVERPASS_EXCEPTIONS = True
 

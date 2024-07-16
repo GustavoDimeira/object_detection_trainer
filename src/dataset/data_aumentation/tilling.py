@@ -1,17 +1,22 @@
-import os, math, shutil, json, copy, numpy as np
+import os, math, shutil, json, copy, numpy as np, sys
 from PIL import Image
 from pycocotools.coco import COCO
 
-ann_path = "all/train/_annotations.coco.json"
-img_root = "all/train"
-saving_path = "all/newDataSet"
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+from src.utils.terminal_handler import LoadingBar
+
+dir_root = os.path.join(os.path.dirname(__file__), "../all")
+
+ann_path = os.path.join(dir_root, "train/_annotations.coco.json")
+img_root = os.path.join(dir_root, "train")
+saving_path = os.path.join(dir_root, "newDataSet")
 
 def tilling(tile_size):
     # recreate the saving directory;
-    if (os.path.exists("all/newDataSet")):
-        shutil.rmtree("all/newDataSet")
+    if (os.path.exists(os.path.join(dir_root, "newDataSet"))):
+        shutil.rmtree(os.path.join(dir_root, "newDataSet"))
         
-    os.mkdir("all/newDataSet")
+    os.mkdir(os.path.join(dir_root, "newDataSet"))
 
     coco = COCO(ann_path) # load annotations;
 
@@ -23,8 +28,15 @@ def tilling(tile_size):
         'annotations': [],
     } # will be used to save the new annotations afther the dataset aumentation;
 
+    amm_imgs = 0 # counter
+    total_images = len(coco.imgs)
+
+    bar = LoadingBar(total_images, "Spliting images", ["", ""])
+    bar.start()
+
     # iterate over every image, spliting then in square tiles and removing cutted ann;
-    for i in range(len(coco.imgs)):
+    for i in range(total_images):
+        colluns, _ = shutil.get_terminal_size()
         img = coco.imgs[i]
         anns = coco.imgToAnns[i]
         img_name = img["file_name"]
@@ -40,7 +52,16 @@ def tilling(tile_size):
         new_height = height // y_cutts
         new_width = width // x_cutts
 
-        print(f"Imagem {img_name.split('.')[0]} repartia em {x_cutts} por {y_cutts}.")
+        imgSplitMsg = f"Imagem {img_name.split('.')[0]} repartia em {x_cutts} por {y_cutts}."
+        imgSplitMsg += "-" * (colluns - len(imgSplitMsg) - 1) + "|"
+
+        amm_imgs += x_cutts * y_cutts
+
+        bar.extraInfos = [
+            f"Processing image: {img_name.split('.')[0]}.",
+            f"{amm_imgs} images generate so far."
+        ]
+        bar.updateBar(i  + 1)
 
         # iterate over the annotations to remove those that are overlapping with the cutts;
         for ann in anns:
@@ -53,7 +74,7 @@ def tilling(tile_size):
             y1_tile = y1 // new_height
             y2_tile = y2 // new_height
 
-            # add to the ann list if both "x" and "y" are in the same tile;
+            # add to the ann list if both "x" and "y" are at the same tile;
             if (x1_tile == x2_tile and y1_tile == y2_tile):
                 tile_pos = x1_tile * x_cutts + y1_tile
                 ann['id'] = len(new_coco_data['annotations'])
@@ -77,13 +98,24 @@ def tilling(tile_size):
                 new_img_infos['id'] = len(new_coco_data['images'])
                 new_img_infos['width'] = new_width
                 new_img_infos['height'] = new_height
-                new_img_infos['file_name'] = f"{img_name.split('.')[0]}_{x}_{y}.jpg"
+                new_img_infos['file_name'] = f"{img_name.split('.')[0]}&{x}_{y}.jpg"
                 
                 new_coco_data['images'].append(new_img_infos)
 
                 new_img = Image.fromarray(img_tile_tensor) # save the tile as a new img;
                 new_img.save(os.path.join(saving_path, new_img_infos['file_name']))
 
+    final_msg = f"{amm_imgs - total_images} images were created over the inicial {total_images}, that is a {(amm_imgs / total_images * 100 - 100):.2f}% increase!!"
+    final_msg = " " * ((colluns - len(final_msg)) // 2) + final_msg
+
+    print(colluns * "=")
+    print(final_msg)
+    print(colluns * "=")
+
     # write the new annotation;
-    with open(os.path.join(saving_path, "_annotations.json"), 'w') as json_file:
+    with open(os.path.join(saving_path, "_annotations.coco.json"), 'w') as json_file:
         json.dump(new_coco_data, json_file, indent=4)
+
+
+if (__name__ == "__main__"):
+    tilling(1000)

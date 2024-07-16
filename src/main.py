@@ -15,13 +15,12 @@ from experiment_config.hyper_parameters import (
 
 if (EARLY_STOP): Hook.after_val_epoch = checkBest
 
-MODELS_KEYS = [k for k in MODELS]
 data_root = os.path.join(os.getcwd(), 'dataset')
 
 # The sequence in which the loops appear will determine the sequence in which the tests are done.
 # You can swap the loops to change this order.
 
-for model in MODELS_KEYS:
+for model in MODELS.keys():
     for fold in range(1, FOLDS + 1): # starting in 1
         for optimizer in OPTIMIZERS:
             for lr in LEARNING_RATES:
