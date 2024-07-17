@@ -1,6 +1,9 @@
 # The function checkBest is called after every validation. It is responsible for stopping the code if it doesn't improve for too long.
 
-from hyper_parameters import EPOCHS, PATIENCE
+# from hyper_paRameters import EPOCHS, PATIENCE
+EPOCHS = 150
+PATIENCE = .05
+
 import os
 
 no_improve = 0

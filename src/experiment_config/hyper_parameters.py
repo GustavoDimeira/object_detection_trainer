@@ -1,5 +1,6 @@
-import os, json
-from ..utils.models_base_config import models_dict
+import os, json, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from utils.models_base_config import models_dict
 
 # -----------------------
 # Define hyperparameters
