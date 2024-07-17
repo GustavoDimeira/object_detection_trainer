@@ -2,7 +2,7 @@ import os, math, shutil, json, copy, numpy as np, sys
 from PIL import Image
 from pycocotools.coco import COCO
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.utils.terminal_handler import LoadingBar
 
 dir_root = os.path.join(os.path.dirname(__file__), "../all")

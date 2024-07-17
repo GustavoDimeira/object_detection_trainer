@@ -15,7 +15,7 @@ class LoadingBar():
 
     def start(self):
         width = shutil.get_terminal_size().columns
-        titleMsg = self.title + " " * (int(width * .85) - len(self.title) - 2)
+        titleMsg = self.title + "-" * (int(width * .85) - len(self.title) - 2)
 
         print('\n', titleMsg, '\n' * (len(self.extraInfos) + 1))
         self.prevWidth = width
@@ -32,7 +32,7 @@ class LoadingBar():
         rightSideBar = f"| {(crrPerc * 100):.2f}% ({crrStep}/{self.steps})"
 
         emptySpace = width * .85 - len(leftSideBar) - len(rightSideBar)
-        barPorgress = math.ceil(emptySpace * crrPerc) * "#"
+        barPorgress = math.ceil(emptySpace * crrPerc) * "="
         emptySection = math.floor((emptySpace * (1 - crrPerc))) * "-"
 
         print(leftSideBar + barPorgress + emptySection + rightSideBar)

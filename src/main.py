@@ -1,5 +1,5 @@
-# This is the main section of the code, it runs the scripts to train and evaluate the model,
-# with each configuration you determine in the experiment_config folder.
+# This is the main section of the code, it runs the scripts to train and evaluate the models,
+# with each combination of configuration you determine in the experiment_config folder.
 
 import os
 from mmcv.runner.hooks import Hook
@@ -20,27 +20,36 @@ data_root = os.path.join(os.getcwd(), 'dataset')
 # The sequence in which the loops appear will determine the sequence in which the tests are done.
 # You can swap the loops to change this order.
 
+combinations = []
 for model in MODELS.keys():
     for fold in range(1, FOLDS + 1): # starting in 1
         for optimizer in OPTIMIZERS:
             for lr in LEARNING_RATES:
-                # The cfg contains all the model configuraton
-                cfg = config_cfg(data_root, EPOCHS, model, lr, fold, optimizer)
+                combinations.append([model, fold, optimizer, lr])
 
-                configuration = {
-                    "model": model,
-                    "optimizer": optimizer,
-                    "fold": fold,
-                    "lr": lr,
-                    "cfg": cfg
-                }
+for i in range(len(combinations)):
+    comb = combinations[i]
+    model, fold, optimizer, lr = comb
+    # The cfg contains all the model configuraton
+    cfg = config_cfg(data_root, EPOCHS, model, lr, fold, optimizer)
 
-                if (OVERPASS_EXCEPTIONS):
-                    try:
-                        if not SKIP_TRAIN: train_model(configuration)
-                        evaluate_model(configuration)
-                    except Exception as e:
-                        error_handler(e)
-                else:
-                    if not SKIP_TRAIN: train_model(configuration)
-                    evaluate_model(configuration)
+    configuration = {
+        "model": model,
+        "optimizer": optimizer,
+        "fold": fold,
+        "lr": lr,
+        "cfg": cfg
+    }
+
+    if (OVERPASS_EXCEPTIONS):
+        try:
+            if not SKIP_TRAIN: train_model(configuration)
+            # evaluate_model(configuration)
+        except Exception as e:
+            error_handler(e)
+    else:
+        if not SKIP_TRAIN: train_model(configuration)
+        # evaluate_model(configuration)
+    
+    with open("./log.json", "w") as log:
+        log.write(str(i))
