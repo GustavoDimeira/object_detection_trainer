@@ -36,7 +36,7 @@ def is_max_score_thr(bb1, pred_array):
         is_max = False
   return is_max
 
-# IOU 
+
 def get_iou(bb1, bb2):
     """
     Calculate the Intersection over Union (IoU) of two bounding boxes.
